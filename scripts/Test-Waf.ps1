@@ -59,12 +59,12 @@ function New-LabClient {
 }
 
 function Invoke-LabHttp {
-    param($Client, [string]$Url, [string]$Method = 'GET', [string]$Json, [string]$TokenCookie, [string]$RequestId)
+    param($Client, [string]$Url, [string]$Method = 'GET', [string]$Json, [string]$BearerToken, [string]$RequestId)
     $message = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::new($Method), $Url)
     $response = $null
     try {
         if ($Json) { $message.Content = New-Object System.Net.Http.StringContent($Json, [Text.Encoding]::UTF8, 'application/json') }
-        if ($TokenCookie) { $message.Headers.Add('Cookie', ('token=' + $TokenCookie)) }
+        if ($BearerToken) { $message.Headers.Add('Authorization', ('Bearer ' + $BearerToken)) }
         if ($RequestId) { $message.Headers.Add('X-Lab-Request-Id', $RequestId) }
         $response = $Client.SendAsync($message).GetAwaiter().GetResult()
         $body = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
@@ -110,15 +110,19 @@ function Test-AdminLogin {
         $record.result = 'FAIL'
         $record.actual = 'Login did not establish the expected admin identity'
         if ($login.Status -eq 200 -and $token) {
-            # This Juice Shop version reads the token cookie, not Authorization.
-            # Request only identity fields; never fetch password/profile/session data.
-            $who = Invoke-LabHttp -Client $client -Url "$BaseUrl/rest/user/whoami?fields=id,email,role" -TokenCookie $token
-            $userId = $who.Json.user.id
-            if ($who.Status -eq 200 -and $userId -and $who.Json.user.email -eq 'admin@juice-sh.op') {
-                $record.identity = [ordered]@{ whoamiStatus = $who.Status; id = $userId; email = $who.Json.user.email; role = $who.Json.user.role }
+            # Decode only to locate the account; server must accept the signed token.
+            # whoami is a CRS 932260 false positive on REQUEST_FILENAME in this image.
+            $part = $token.Split('.')[1].Replace('-', '+').Replace('_', '/')
+            $part = $part.PadRight($part.Length + ((4 - $part.Length % 4) % 4), '=')
+            $claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($part)) | ConvertFrom-Json
+            $userId = [int]$claims.data.id
+            $identityUrl = "$BaseUrl/api/Users/$userId"
+            $who = Invoke-LabHttp -Client $client -Url $identityUrl -BearerToken $token
+            $record.identity = [ordered]@{ url = $identityUrl; statusCode = $who.Status; id = $who.Json.data.id; email = $who.Json.data.email; role = $who.Json.data.role }
+            if ($who.Status -eq 200 -and $who.Json.data.id -eq $userId -and $claims.data.email -eq 'admin@juice-sh.op' -and $claims.data.role -eq 'admin' -and $who.Json.data.email -eq 'admin@juice-sh.op') {
                 if ($record.identity.role -eq 'admin') {
                     $record.result = 'PASS'
-                    $record.actual = 'Login 200; fresh token cookie verified by server whoami: admin@juice-sh.op / admin'
+                    $record.actual = 'Login 200; fresh bearer token accepted by Users API; signed identity matches server: admin@juice-sh.op / admin'
                 }
             }
         }
@@ -153,7 +157,7 @@ function Test-BlockedLogin {
     return $record
 }
 
-$context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::Now.ToString('o'); endpointSource = 'main.js, build/server.js, build/routes/login.js and build/routes/currentUser.js inspected; whoami requires a token cookie'; preflight = 'NOT RUN' }
+$context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::Now.ToString('o'); endpointSource = 'build/server.js and build/routes/currentUser.js inspected; POST /rest/user/login; authenticated GET /api/Users/:id; whoami blocked by CRS 932260'; preflight = 'NOT RUN' }
 try {
     $configuration = Invoke-Compose @('config', '--format', 'json') | ConvertFrom-Json
     $environmentValues = (Invoke-Compose @('exec', '-T', 'waf', 'printenv', 'MODSEC_RULE_ENGINE', 'BLOCKING_PARANOIA')).Trim() -split '\r?\n'
