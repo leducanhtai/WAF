@@ -3,3 +3,14 @@ services:
     image: bkimminich/juice-shop:latest@sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4
     ports:
       - "127.0.0.1:3000:3000"
+
+  waf:
+    image: owasp/modsecurity-crs:nginx@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      BACKEND: http://web:3000
+      MODSEC_RULE_ENGINE: "On"
+      BLOCKING_PARANOIA: "1"
+    depends_on:
+      - web

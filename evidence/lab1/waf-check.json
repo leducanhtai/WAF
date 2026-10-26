@@ -1,0 +1,21 @@
+﻿{
+    "capturedAt":  "2026-10-26T21:47:38.0188063+07:00",
+    "command":  "Invoke-WebRequest -UseBasicParsing http://localhost:8080/",
+    "statusCode":  200,
+    "contentType":  "text/html; charset=UTF-8",
+    "juiceShopTitle":  true,
+    "appRoot":  true,
+    "containerState":  "running",
+    "ports":  {
+                  "8080/tcp":  [
+                                   {
+                                       "HostIp":  "127.0.0.1",
+                                       "HostPort":  "8080"
+                                   }
+                               ]
+              },
+    "imageReference":  "owasp/modsecurity-crs:nginx@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d",
+    "imageId":  "sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d",
+    "repoDigests":  "owasp/modsecurity-crs@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d",
+    "configurationAssertions":  "PASS: module loaded, modsecurity on, SecRuleEngine On, blocking_paranoia_level=1, proxy_pass http://web:3000"
+}

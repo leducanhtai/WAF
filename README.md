@@ -61,7 +61,26 @@ docker compose logs --tail 30 web
 
 Mở `http://localhost:3000` để xem Juice Shop. Image backend được khóa bằng digest trong Compose; nhãn `latest` chỉ thể hiện tag nguồn đã tải. Phiên bản thực tế và kết quả HTTP được ghi trong `evidence/lab1/backend-check.json`.
 
-Hướng dẫn vận hành toàn bộ WAF được bổ sung ở bước tiếp theo.
+## Chạy WAF
+
+```powershell
+docker compose config --quiet
+docker compose up -d
+docker compose ps
+docker compose logs --tail 50 waf
+```
+
+Mở `http://localhost:8080` để truy cập Juice Shop qua WAF. `depends_on` giúp khởi động backend trước WAF nhưng không bảo đảm backend đã sẵn sàng; cần đợi HTTP thực tế.
+
+| Biến | Giá trị lab | Ý nghĩa |
+|---|---|---|
+| `BACKEND` | `http://web:3000` | Địa chỉ backend trên mạng Compose |
+| `MODSEC_RULE_ENGINE` | `On` | Bật kiểm tra và chặn theo luật; `DetectionOnly` chỉ phát hiện/ghi log |
+| `BLOCKING_PARANOIA` | `1` | Mức CRS cơ bản; mức 1–4 cao hơn có thể tăng chặn nhầm |
+
+Image WAF cũng được khóa digest. Lab dùng cấu hình Nginx/ModSecurity/CRS có sẵn trong image, không mount luật tùy chỉnh. Cấu hình được sinh từ biến môi trường khi container khởi động; dùng `docker compose up -d --force-recreate waf` sau khi cần tái tạo cấu hình.
+
+Log được đọc qua `docker compose logs waf`. Vị trí audit log và cấu hình Nginx cần kiểm tra từ chính image đang chạy; bằng chứng cấu hình được lưu trong `evidence/lab1/waf-config.txt`.
 
 ## Nguồn đối chiếu
 
