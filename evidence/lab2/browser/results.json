@@ -1,0 +1,81 @@
+{
+  "method": "Edge headless + CDP; real form input/click; Network.responseReceived; real screenshots; DevTools panel not captured",
+  "results": [
+    {
+      "test": "TC01",
+      "time": "2026-10-26T15:27:22.230Z",
+      "timezone": "UTC; Asia/Bangkok = UTC+07:00",
+      "url": "http://localhost:3000/#/login",
+      "input": {
+        "email": "' OR 1=1--",
+        "password": "lab-password"
+      },
+      "cleanContext": true,
+      "loginNetwork": [
+        {
+          "url": "http://localhost:3000/rest/user/login",
+          "status": 200
+        }
+      ],
+      "identity": {
+        "hasToken": true,
+        "status": 200,
+        "id": 1,
+        "email": "admin@juice-sh.op",
+        "role": "admin",
+        "claimMatches": true
+      },
+      "result": "PASS",
+      "screenshot": "TC01.png"
+    },
+    {
+      "test": "TC02",
+      "time": "2026-10-26T15:27:26.317Z",
+      "timezone": "UTC; Asia/Bangkok = UTC+07:00",
+      "url": "http://localhost:8080/#/login",
+      "input": {
+        "email": "' OR 1=1--",
+        "password": "lab-password"
+      },
+      "cleanContext": true,
+      "loginNetwork": [
+        {
+          "url": "http://localhost:8080/rest/user/login",
+          "status": 403
+        }
+      ],
+      "identity": {
+        "hasToken": false
+      },
+      "result": "PASS",
+      "screenshot": "TC02.png"
+    },
+    {
+      "test": "TC03",
+      "time": "2026-10-26T15:27:30.663Z",
+      "timezone": "UTC; Asia/Bangkok = UTC+07:00",
+      "url": "http://localhost:8080/#/login",
+      "input": {
+        "email": "admin@juice-sh.op",
+        "password": "admin123"
+      },
+      "cleanContext": true,
+      "loginNetwork": [
+        {
+          "url": "http://localhost:8080/rest/user/login",
+          "status": 200
+        }
+      ],
+      "identity": {
+        "hasToken": true,
+        "status": 200,
+        "id": 1,
+        "email": "admin@juice-sh.op",
+        "role": "admin",
+        "claimMatches": true
+      },
+      "result": "PASS",
+      "screenshot": "TC03.png"
+    }
+  ]
+}
