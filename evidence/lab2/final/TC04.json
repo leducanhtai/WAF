@@ -1,0 +1,77 @@
+﻿{
+    "test":  "TC04",
+    "startedAt":  "2026-10-26T22:31:13.0674329+07:00",
+    "finishedAt":  "2026-10-26T22:31:13.5629420+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "result":  "PASS",
+    "expected":  "Rule 942100 in fresh TC02 transaction with HTTP 403",
+    "request":  {
+                    "url":  "http://localhost:8080/rest/user/login",
+                    "method":  "POST",
+                    "path":  "/rest/user/login",
+                    "contentType":  "application/json; charset=utf-8",
+                    "input":  {
+                                  "email":  "\u0027 OR 1=1--",
+                                  "password":  "lab-password"
+                              },
+                    "bodySha256":  "ecf2d37cbfb9e3a71561cb3274f65d64bb483a60492234c39f6526b059a3bacc",
+                    "requestId":  "lab2-95820a51a9fa47eab9a0f2fabe9f6d4d"
+                },
+    "response":  {
+                     "statusCode":  403,
+                     "hasAuthenticationToken":  false,
+                     "setCookiePresent":  false
+                 },
+    "identity":  null,
+    "ruleIds":  [
+                    "942100",
+                    "949110"
+                ],
+    "actual":  "Fresh TC02 request ID matched JSON audit transaction; 942100 detected SQLi and 949110 enforced anomaly blocking",
+    "sourceTest":  {
+                       "test":  "TC02",
+                       "startedAt":  "2026-10-26T22:31:10.8898412+07:00",
+                       "finishedAt":  "2026-10-26T22:31:12.9652087+07:00",
+                       "timezone":  "Asia/Bangkok (UTC+07:00)",
+                       "result":  "PASS",
+                       "expected":  "HTTP 403; no authentication token or session cookie",
+                       "request":  {
+                                       "url":  "http://localhost:8080/rest/user/login",
+                                       "method":  "POST",
+                                       "path":  "/rest/user/login",
+                                       "contentType":  "application/json; charset=utf-8",
+                                       "input":  {
+                                                     "email":  "\u0027 OR 1=1--",
+                                                     "password":  "lab-password"
+                                                 },
+                                       "bodySha256":  "ecf2d37cbfb9e3a71561cb3274f65d64bb483a60492234c39f6526b059a3bacc",
+                                       "requestId":  "lab2-95820a51a9fa47eab9a0f2fabe9f6d4d"
+                                   },
+                       "response":  {
+                                        "statusCode":  403,
+                                        "hasAuthenticationToken":  false,
+                                        "setCookiePresent":  false
+                                    },
+                       "identity":  null,
+                       "ruleIds":  [
+
+                                   ],
+                       "actual":  "HTTP 403; no authentication token or Set-Cookie returned",
+                       "logSinceUtc":  "2026-10-26T15:31:08.890Z"
+                   },
+    "logSinceUtc":  "2026-10-26T15:31:08.890Z",
+    "transactions":  [
+                         {
+                             "timestampUtc":  "Mon Oct 26 15:31:12 2026",
+                             "transactionId":  "179302867231.886547",
+                             "requestId":  "lab2-95820a51a9fa47eab9a0f2fabe9f6d4d",
+                             "method":  "POST",
+                             "uri":  "/rest/user/login",
+                             "statusCode":  403,
+                             "ruleIds":  [
+                                             "942100",
+                                             "949110"
+                                         ]
+                         }
+                     ]
+}

@@ -1,6 +1,6 @@
 # Kế hoạch kiểm thử Bài 2 — slide 18
 
-**Trạng thái: NOT RUN.** File này chuẩn bị tiêu chí; Bài 1 không gửi payload tấn công hoặc thực hiện các test đăng nhập dưới đây.
+**Đã thực hiện ngày 26/10/2026: TC01–TC04 PASS ở lượt cuối.** Xem [báo cáo](lab-report.md) và [bằng chứng cuối](../evidence/lab2/final/run.json). Ma trận dưới giữ nguyên tiêu chí từ Bài 1; trạng thái NOT RUN ban đầu đã được thay bằng kết quả thực tế.
 
 ## Điều kiện và cách ghi nhận
 
@@ -15,10 +15,10 @@
 
 | ID | Thao tác | Kỳ vọng theo slide | Thực tế | Trạng thái |
 |---|---|---|---|---|
-| TC01 | `http://localhost:3000` → Login; email `' OR 1=1--`; password `lab-password` | Đăng nhập thành công vào tài khoản admin; xác minh danh tính thực tế | Chưa thực hiện | NOT RUN |
-| TC02 | `http://localhost:8080` → Login; cùng dữ liệu TC01 | Request login trả HTTP 403, không nhận token đăng nhập | Chưa thực hiện | NOT RUN |
-| TC03 | Qua cổng 8080; `admin@juice-sh.op` / `admin123` | Đăng nhập thành công, danh tính đúng | Chưa thực hiện | NOT RUN |
-| TC04 | `docker compose logs waf`; đối chiếu giao dịch TC02 bằng timestamp/transaction ID nếu có | Thấy rule `942100` gắn với request TC02 | Chưa thực hiện | NOT RUN |
+| TC01 | `http://localhost:3000` → Login; email `' OR 1=1--`; password `lab-password` | Đăng nhập thành công vào tài khoản admin; xác minh danh tính thực tế | 200; Users API xác nhận ID 1, admin@juice-sh.op, role admin | PASS |
+| TC02 | `http://localhost:8080` → Login; cùng dữ liệu TC01 | Request login trả HTTP 403, không nhận token đăng nhập | 403; không token hoặc Set-Cookie | PASS |
+| TC03 | Qua cổng 8080; `admin@juice-sh.op` / `admin123` | Đăng nhập thành công, danh tính đúng | 200; Users API qua 8080 xác nhận admin; GUI có giới hạn whoami | PASS |
+| TC04 | `docker compose logs waf`; đối chiếu giao dịch TC02 bằng timestamp/transaction ID nếu có | Thấy rule `942100` gắn với request TC02 | Request ID mới khớp transaction có 942100 và 949110 | PASS |
 
 ## Quy tắc kết luận
 

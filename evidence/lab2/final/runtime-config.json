@@ -1,0 +1,22 @@
+﻿{
+    "capturedAt":  "2026-10-26T22:25:50.9299447+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "modsecurity":  [
+                        "SecRuleEngine On",
+                        "SecAuditEngine RelevantOnly",
+                        "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\"",
+                        "SecAuditLogParts ABIJDEFHZ",
+                        "SecAuditLogType Serial",
+                        "SecAuditLog /dev/stdout",
+                        "SecAuditLogFormat JSON",
+                        "SecAuditLogStorageDir /var/log/modsecurity/audit/"
+                    ],
+    "paranoia":  [
+                     "setvar:tx.blocking_paranoia_level=1\""
+                 ],
+    "nginx":  [
+                  "load_module modules/ngx_http_modsecurity_module.so;",
+                  "proxy_pass http://web:3000;",
+                  "modsecurity on;"
+              ]
+}

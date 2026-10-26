@@ -1,4 +1,11 @@
-# Bài 1 — WAF trên Nginx
+# Bài 1–2 — WAF trên Nginx
+
+**Bài 2 đã thực hiện ngày 26/10/2026:** TC01–TC04 PASS ở lượt chạy cuối, có bằng chứng HTTP, audit log đã lọc và ảnh Edge thật. Xem [báo cáo Bài 2](docs/lab-report.md) để chạy script, demo Network và xem giới hạn GUI (`/whoami` bị chặn nhầm). Các ghi chú NOT RUN trong phần lịch sử Bài 1 bên dưới mô tả thời điểm bàn giao Bài 1, không phải trạng thái Bài 2 hiện tại.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Waf.ps1 -Test All
+# Chọn riêng bằng -Test TC01, TC02, TC03 hoặc TC04.
+```
 
 Lab theo mục 5 của [tài liệu bài giảng](Tong_hop_bai_giang_Thiet_ke_cho_bao_mat.md), slide 17–18. Bài 1 dựng OWASP Juice Shop phía sau Nginx + ModSecurity + OWASP CRS. Bài 2 kiểm thử đăng nhập được chuẩn bị trong [test plan](docs/test-plan.md), trạng thái ban đầu **NOT RUN**.
 

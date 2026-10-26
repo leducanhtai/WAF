@@ -1,0 +1,68 @@
+﻿[
+    {
+        "timeUtc":  "Mon Oct 26 15:27:24 2026",
+        "uri":  "/rest/user/whoami",
+        "status":  403,
+        "transactionId":  "179302844482.096942",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    },
+    {
+        "timeUtc":  "Mon Oct 26 15:27:24 2026",
+        "uri":  "/rest/user/whoami?fields=email",
+        "status":  403,
+        "transactionId":  "179302844467.006192",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    },
+    {
+        "timeUtc":  "Mon Oct 26 15:27:28 2026",
+        "uri":  "/rest/user/whoami?fields=email",
+        "status":  403,
+        "transactionId":  "179302844888.659845",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    },
+    {
+        "timeUtc":  "Mon Oct 26 15:27:28 2026",
+        "uri":  "/rest/user/whoami",
+        "status":  403,
+        "transactionId":  "179302844890.947409",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    },
+    {
+        "timeUtc":  "Mon Oct 26 15:27:28 2026",
+        "uri":  "/rest/user/whoami",
+        "status":  403,
+        "transactionId":  "179302844870.548842",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    },
+    {
+        "timeUtc":  "Mon Oct 26 15:27:28 2026",
+        "uri":  "/rest/user/whoami?fields=email",
+        "status":  403,
+        "transactionId":  "179302844859.105933",
+        "rules":  [
+                      "932260",
+                      "949110"
+                  ],
+        "matchedTarget":  "REQUEST_FILENAME: /rest/user/whoami"
+    }
+]

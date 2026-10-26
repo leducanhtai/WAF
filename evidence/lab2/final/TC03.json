@@ -1,0 +1,36 @@
+﻿{
+    "test":  "TC03",
+    "startedAt":  "2026-10-26T22:31:12.9659707+07:00",
+    "finishedAt":  "2026-10-26T22:31:13.0556530+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "result":  "PASS",
+    "expected":  "HTTP 200, authenticated admin@juice-sh.op, role admin verified from server",
+    "request":  {
+                    "url":  "http://localhost:8080/rest/user/login",
+                    "method":  "POST",
+                    "path":  "/rest/user/login",
+                    "contentType":  "application/json; charset=utf-8",
+                    "input":  {
+                                  "email":  "admin@juice-sh.op",
+                                  "password":  "admin123"
+                              },
+                    "bodySha256":  "b9d2503993e3807aab3cbb8988bd44e7843d45134551f3ae35d13e32998302e8",
+                    "requestId":  "lab2-95820a51a9fa47eab9a0f2fabe9f6d4d-valid"
+                },
+    "response":  {
+                     "statusCode":  200,
+                     "hasAuthenticationToken":  true,
+                     "setCookiePresent":  false
+                 },
+    "identity":  {
+                     "url":  "http://localhost:8080/api/Users/1",
+                     "statusCode":  200,
+                     "id":  1,
+                     "email":  "admin@juice-sh.op",
+                     "role":  "admin"
+                 },
+    "ruleIds":  [
+
+                ],
+    "actual":  "Login 200; fresh bearer token accepted by Users API; signed identity matches server: admin@juice-sh.op / admin"
+}

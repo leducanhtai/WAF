@@ -1,0 +1,31 @@
+﻿{
+    "test":  "TC02",
+    "startedAt":  "2026-10-26T22:31:10.8898412+07:00",
+    "finishedAt":  "2026-10-26T22:31:12.9652087+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "result":  "PASS",
+    "expected":  "HTTP 403; no authentication token or session cookie",
+    "request":  {
+                    "url":  "http://localhost:8080/rest/user/login",
+                    "method":  "POST",
+                    "path":  "/rest/user/login",
+                    "contentType":  "application/json; charset=utf-8",
+                    "input":  {
+                                  "email":  "\u0027 OR 1=1--",
+                                  "password":  "lab-password"
+                              },
+                    "bodySha256":  "ecf2d37cbfb9e3a71561cb3274f65d64bb483a60492234c39f6526b059a3bacc",
+                    "requestId":  "lab2-95820a51a9fa47eab9a0f2fabe9f6d4d"
+                },
+    "response":  {
+                     "statusCode":  403,
+                     "hasAuthenticationToken":  false,
+                     "setCookiePresent":  false
+                 },
+    "identity":  null,
+    "ruleIds":  [
+
+                ],
+    "actual":  "HTTP 403; no authentication token or Set-Cookie returned",
+    "logSinceUtc":  "2026-10-26T15:31:08.890Z"
+}
