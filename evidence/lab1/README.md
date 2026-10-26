@@ -67,7 +67,7 @@ Lệnh, đầu ra, exit code và thời gian đo được lưu trong `readiness-
 
 ## Giới hạn và thay đổi môi trường
 
-- Mọi TC01–TC04 trong [test plan Bài 2](../../docs/test-plan.md) vẫn **NOT RUN**. Chưa xác minh SQL Injection, tài khoản admin hoặc rule 942100 trên request login.
+- Kết quả kiểm thử SQL Injection và đăng nhập được trình bày trong [báo cáo Bài 2](../../docs/lab-report.md).
 - Quan sát thật: trình duyệt gửi POST `/socket.io/` dạng `text/plain`; CRS `920420` cộng điểm, `949110` chặn 403. Trang sản phẩm render được nhưng realtime có thể bị ảnh hưởng. Không sửa policy để che hiện tượng; xem `browser-observation.json`.
 - Image mặc định có cảnh báo SSL stapling vì chứng chỉ nội bộ; `nginx -T` thành công. Lab dùng HTTP, không publish cổng HTTPS 8443.
 - Cổng 8080 từng bị `PEMHTTPD-x64` của EDB PEM chiếm. Người dùng đã dừng dịch vụ bằng quyền quản trị. Dịch vụ được để dừng cho WAF dùng cổng; startup type không đổi. Khi muốn khôi phục: `docker compose down`, rồi `Start-Service -Name PEMHTTPD-x64` trong PowerShell quản trị.

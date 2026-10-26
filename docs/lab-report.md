@@ -2,7 +2,7 @@
 
 ## Kết quả thực tế
 
-Lượt chạy cuối ngày **26/10/2026, 22:31:01–22:31:13, Asia/Bangkok (UTC+07:00)**, sau thay đổi script cuối: **TC01–TC04 PASS**, tiến trình PowerShell exit **0**. Nguồn chi tiết: [run.json](../evidence/lab2/final/run.json). Đây là kết quả chạy thực tế, không suy ra từ slide.
+Bộ kết quả lưu trong báo cáo được chạy ngày **26/10/2026, 22:31:01–22:31:13, Asia/Bangkok (UTC+07:00)**: **TC01–TC04 PASS**, tiến trình PowerShell exit **0**. Nguồn chi tiết: [run.json](../evidence/lab2/final/run.json).
 
 | Test | Thời điểm bắt đầu UTC+07 | URL / đầu vào | Kỳ vọng | Thực tế | Rule | Kết quả |
 |---|---|---|---|---|---|---|
@@ -13,9 +13,8 @@ Lượt chạy cuối ngày **26/10/2026, 22:31:01–22:31:13, Asia/Bangkok (UTC
 
 Mỗi file [TC01](../evidence/lab2/final/TC01.json), [TC02](../evidence/lab2/final/TC02.json), [TC03](../evidence/lab2/final/TC03.json), [TC04](../evidence/lab2/final/TC04.json) ghi thời gian bắt đầu/kết thúc, URL, đầu vào, kỳ vọng/thực tế, HTTP status, danh tính nếu có, rule và trạng thái. Mảng rule rỗng của TC01/TC03 không khẳng định toàn bộ hoạt động trình duyệt không phát sinh cảnh báo.
 
-## Phạm vi, readiness và phương pháp
+## Môi trường và cách kiểm thử
 
-Đã đọc mục 5 tài liệu bài giảng, README, Compose, test-plan, script hiện có và `git status` trước khi sửa. Không tìm thấy AGENTS.md trong repository hoặc các thư mục cha áp dụng. Trạng thái đầu có commit TC01 `cfeda08`, TC02 `1d951a2`, fix `b2f4c7d`; phần TC03 chưa commit. Tiếp tục từ đó, không sửa lịch sử, không tạo lại commit rỗng. `CODE_REVIEW_BAI_1.md` và `evidence/lab1/review/` có sẵn, không đưa vào commit Bài 2.
 
 Hai service chạy trên mapping `127.0.0.1:3000:3000` và `127.0.0.1:8080:8080`. Mỗi lượt tự động chạy readiness kiểm tra HTML Juice Shop qua cả hai cổng, kiểm tra biến môi trường và file cấu hình sinh trong container: `SecRuleEngine On`, blocking paranoia `1`. [runtime-config.json](../evidence/lab2/final/runtime-config.json) xác nhận Nginx nạp ModSecurity, `modsecurity on`, proxy tới `http://web:3000`. Digest hai image nằm trong [run.json](../evidence/lab2/final/run.json) và Compose; giữ nguyên phiên bản Bài 1 (Juice Shop 20.3.0, CRS 4.30.0).
 
@@ -40,9 +39,9 @@ Logging hiện tại đủ: `RelevantOnly`, `Serial`, JSON, `/dev/stdout`; khôn
 
 ## Điều tra và giới hạn còn lại
 
-1. HTTP client .NET Framework ban đầu tự thêm `Expect: 100-continue`, bị `920450` chặn trước khi đánh giá SQLi. Commit có sẵn `b2f4c7d` tắt header tự động ở client, không đổi WAF. Bằng chứng lịch sử: [http-client-fix](../evidence/lab2/http-client-fix/run.json).
-2. TC03 ban đầu login 200 nhưng xác minh `/rest/user/whoami` bị 403 nên ghi FAIL đúng trong [tc03](../evidence/lab2/tc03/TC03.json). Điều tra xác nhận `932260` khớp **REQUEST_FILENAME `/rest/user/whoami`**, không phải password hay trường `id`. Bỏ `id` khỏi query vẫn bị chặn. Đã đổi phép xác minh sang API Users có xác thực; không loại trừ endpoint, không tắt WAF, không sửa Juice Shop hay tạo rule giả. [identity-fix](../evidence/lab2/identity-fix/TC03.json) ghi kết quả sửa; trường `endpointSource` của snapshot cũ còn mô tả cách whoami ban đầu, nguồn chính xác hiện tại là `final/run.json`.
-3. Chặn nhầm `/whoami` **chưa được sửa trong policy**: menu Account ở GUI TC03 không hiện email, dù đăng nhập và API Users xác nhận admin. [Quan sát GUI liên quan](../evidence/lab2/final/gui-whoami-observation.json). Bài 1 còn ghi nhận Socket.IO bị `920420`; không dùng lỗi này làm bằng chứng SQLi. PASS TC03 đánh giá đăng nhập và danh tính, không chứng nhận mọi chức năng giao diện hoạt động bình thường.
+- Client .NET Framework tự thêm `Expect: 100-continue` có thể bị rule `920450` chặn trước khi kiểm tra SQLi. Script đã tắt header tự động này.
+- Rule `932260` khớp tên đường dẫn `/rest/user/whoami`, gây chặn nhầm HTTP 403. Vì vậy script dùng Users API có xác thực để kiểm tra danh tính. Login và API Users qua WAF đều trả 200, nhưng menu Account trên giao diện không hiện email. Xem [log quan sát](../evidence/lab2/final/gui-whoami-observation.json).
+- Socket.IO dạng `text/plain` cũng bị chặn bởi `920420` và `949110`. Kết quả PASS của TC03 chỉ xác nhận đăng nhập đúng danh tính, không có nghĩa mọi chức năng giao diện đều hoạt động bình thường.
 
 ## Demo bằng trình duyệt và ảnh thật
 
@@ -52,9 +51,9 @@ Logging hiện tại đủ: `RelevantOnly`, `Serial`, JSON, `/dev/stdout`; khôn
 - [Ảnh TC02](../evidence/lab2/browser/TC02.png): form hiển thị nội dung lỗi 403 từ Nginx.
 - [Ảnh TC03](../evidence/lab2/browser/TC03.png): đăng nhập vào trang sản phẩm; ô email menu trống do giới hạn `/whoami` nêu trên.
 
-Ảnh là ảnh chụp thật, đã xem lại; không có token/cookie trong ảnh. **Chưa kiểm chứng trực tiếp thao tác trên panel DevTools Network và chưa có ảnh panel này**; status đã xác nhận bằng sự kiện Network của trình duyệt. Những lần chụp thử bị popup che/timeout đã được chạy lại; ảnh nộp là lượt thành công cuối.
+Ảnh là ảnh chụp thật, đã xem lại; không có token/cookie trong ảnh. **Chưa kiểm chứng trực tiếp thao tác trên panel DevTools Network và chưa có ảnh panel này**; status đã xác nhận bằng sự kiện Network của trình duyệt.
 
-Checklist demo thủ công:
+Các bước demo:
 
 1. Đóng toàn bộ cửa sổ InPrivate/Incognito trước mỗi test rồi mở một phiên mới. Cookie không tách theo cổng: không dùng chung phiên 3000 và 8080. Không bật Remember me.
 2. Mở `http://localhost:3000/#/login` cho TC01, đóng Welcome bằng Dismiss và banner cookie. Nhập `' OR 1=1--` / `lab-password`; nhấn Log in; kiểm tra Account hiển thị admin.
@@ -86,23 +85,3 @@ Script GUI cần Node 22+ và Edge tại Program Files (x86), ghi đè thư mụ
 **Gatekeeper:** WAF đứng trước backend ở đường 8080, kiểm tra request và chặn SQLi trước khi chuyển tiếp. **Gateway Offloading:** việc kiểm tra HTTP bằng ModSecurity/CRS được đưa lên reverse proxy, tách khỏi xử lý nghiệp vụ Juice Shop. Cổng 3000 đi thẳng backend; 8080 qua Nginx + ModSecurity + CRS rồi mới tới backend nếu được cho phép.
 
 WAF **không sửa lỗ hổng backend**: TC01 vẫn khai thác được SQLi khi đi thẳng. Cổng 3000 được giữ có chủ đích để đối chứng trong lab localhost, không phải kiến trúc triển khai Internet cho phép bỏ qua WAF. Kết quả chỉ chứng minh payload và phiên bản đang thử, không chứng minh chặn mọi SQLi; policy cũng có thể chặn nhầm như `/whoami`.
-
-## Yêu cầu → file/bằng chứng → commit triển khai
-
-Hash bên dưới đều đã tồn tại trước commit báo cáo. Các file `final/*` và báo cáo được bổ sung trong commit tài liệu; hash commit tài liệu được cung cấp trong phản hồi bàn giao, không tự tham chiếu trong file.
-
-| Yêu cầu | File / bằng chứng | Commit triển khai đã tồn tại |
-|---|---|---|
-| TC01; JSON, timeout, phiên riêng, danh tính; phần dùng chung tối thiểu | `scripts/Test-Waf.ps1`, `evidence/lab2/tc01/` | `cfeda08` |
-| TC02; cùng payload, HTTP 403 và không token | script, `evidence/lab2/tc02/` | `1d951a2` |
-| Sửa Expect header; không đổi WAF | script, `evidence/lab2/http-client-fix/`, `investigation/` | `b2f4c7d` |
-| TC03 đúng đầu vào và ghi FAIL ban đầu trung thực | script, `evidence/lab2/tc03/` | `2b3eece` |
-| Xác minh signed identity với Users API qua cùng cổng | script, `evidence/lab2/identity-fix/` | `a7f6c13` |
-| TC04 riêng tạo TC02 mới; timestamp/request ID/transaction ID; rule 942100; lọc log an toàn | script, `evidence/lab2/tc04/` | `c6b5c0f` |
-| Múi giờ cố định, NOT RUN ghi bước preflight lỗi | script | `0dc0854` |
-| GUI phiên sạch, ảnh thật, status Network, danh tính | `scripts/Test-WafBrowser.cjs`, `evidence/lab2/browser/` | `f31f0c8` |
-| Readiness, On/PL1, hai cổng localhost giữ nguyên | `docker-compose.yml`, `scripts/Wait-LabReady.ps1`, `final/runtime-config.json` | `962e3a3`, `3daf022`; kiểm tra trong script từ `cfeda08` |
-| Lượt cuối toàn bộ test sau thay đổi code cuối | `evidence/lab2/final/run.json`, `TC01.json`–`TC04.json` | Chạy trên HEAD `f31f0c8` |
-| Báo cáo tiếng Việt, demo Network, giới hạn, dữ liệu đã lọc, bảng truy vết | `docs/lab-report.md`, README, test-plan, `final/` | Tổng hợp các commit trên; commit tài liệu được liệt kê lúc bàn giao |
-
-Không push; mỗi thay đổi chức năng/fix có commit riêng. Các file review Bài 1 ngoài phạm vi vẫn được giữ nguyên.

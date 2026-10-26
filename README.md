@@ -1,13 +1,6 @@
 # Bài 1–2 — WAF trên Nginx
 
-**Bài 2 đã thực hiện ngày 26/10/2026:** TC01–TC04 PASS ở lượt chạy cuối, có bằng chứng HTTP, audit log đã lọc và ảnh Edge thật. Xem [báo cáo Bài 2](docs/lab-report.md) để chạy script, demo Network và xem giới hạn GUI (`/whoami` bị chặn nhầm). Các ghi chú NOT RUN trong phần lịch sử Bài 1 bên dưới mô tả thời điểm bàn giao Bài 1, không phải trạng thái Bài 2 hiện tại.
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Waf.ps1 -Test All
-# Chọn riêng bằng -Test TC01, TC02, TC03 hoặc TC04.
-```
-
-Lab theo mục 5 của [tài liệu bài giảng](Tong_hop_bai_giang_Thiet_ke_cho_bao_mat.md), slide 17–18. Bài 1 dựng OWASP Juice Shop phía sau Nginx + ModSecurity + OWASP CRS. Bài 2 kiểm thử đăng nhập được chuẩn bị trong [test plan](docs/test-plan.md), trạng thái ban đầu **NOT RUN**.
+Lab theo mục 5 của [tài liệu bài giảng](Tong_hop_bai_giang_Thiet_ke_cho_bao_mat.md), slide 17–18. Bài 1 dựng OWASP Juice Shop phía sau Nginx + ModSecurity + OWASP CRS. Bài 2 kiểm thử đăng nhập trực tiếp và qua WAF; kết quả nằm trong [báo cáo](docs/lab-report.md).
 
 ## Kiến trúc và phạm vi
 
@@ -28,7 +21,7 @@ flowchart LR
 
 Đây là ví dụ **Gatekeeper** tại cổng vào và **Gateway Offloading** cho việc kiểm tra request. Cổng 3000 giữ lại để đối chứng với đường qua WAF ở Bài 2. Cả hai cổng host đều bind `127.0.0.1`: **điều chỉnh phục vụ lab so với slide**, vốn dùng `3000:3000` và `8080:8080` không chỉ định địa chỉ host. Truy cập bằng HTTP trên máy này; backend nội bộ dùng tên service `web`.
 
-Phạm vi Bài 1 gồm Compose, readiness, cấu hình và log thực tế. JWT, MinIO, Sidecar, rate limiting và kiểm thử tấn công không thuộc phần triển khai này.
+Bài 1 kiểm tra cấu hình và khả năng truy cập; Bài 2 kiểm tra SQL Injection, đăng nhập hợp lệ và log CRS.
 
 ## Điều kiện chạy
 
@@ -36,26 +29,6 @@ Phạm vi Bài 1 gồm Compose, readiness, cấu hình và log thực tế. JWT,
 - Windows PowerShell 5.1 hoặc PowerShell 7 cho script readiness.
 - Cổng TCP 3000 và 8080 còn trống; có mạng để tải image lần đầu.
 - Chạy lệnh ở thư mục repository.
-
-## Tiêu chí nghiệm thu
-
-| ID | Điều cần chứng minh |
-|---|---|
-| L1-01 | `docker compose config --quiet` thành công |
-| L1-02 | Hai service `web`, `waf` đang chạy với mapping localhost đúng |
-| L1-03 | HTTP 200 và HTML Juice Shop qua cả cổng 3000 và 8080; asset giao diện tải được |
-| L1-04 | Nginx nạp module ModSecurity, bật kiểm tra; engine `On`, blocking paranoia `1`, CRS được include |
-| L1-05 | Proxy thực tế đến `http://web:3000`; đọc được startup/access log WAF |
-| L1-06 | Có phiên bản Docker/Compose, image tag/digest và bằng chứng thật trong `evidence/lab1` |
-
-Các tiêu chí trên không chứng minh khả năng chặn SQL Injection. TC01–TC04 thuộc Bài 2 và được theo dõi riêng.
-
-## Tiến độ commit dự kiến
-
-1. `docs(lab): define WAF scope and acceptance criteria`
-2. `feat(lab1): add Juice Shop backend`
-3. `feat(lab1): add Nginx ModSecurity CRS gateway`
-4. `chore(lab1): add readiness checks and runtime evidence`
 
 ## Chạy riêng backend
 
@@ -103,6 +76,16 @@ pwsh -NoProfile -File .\scripts\Wait-LabReady.ps1 -TimeoutSeconds 120
 powershell.exe -NoProfile -File .\scripts\Wait-LabReady.ps1 -WebUrl http://127.0.0.1:3000/ -WafUrl http://127.0.0.1:8080/
 ```
 
+## Kiểm thử Bài 2
+
+Sau khi hệ thống sẵn sàng, chạy:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Waf.ps1 -Test All
+```
+
+Thay `All` bằng `TC01`, `TC02`, `TC03` hoặc `TC04` để chạy riêng. Script lưu kết quả vào `evidence/lab2/latest/`; exit code 0 là đạt. TC04 chạy riêng sẽ tạo request SQLi mới để đối chiếu log. Hướng dẫn demo trình duyệt và kết quả chi tiết nằm trong [báo cáo](docs/lab-report.md).
+
 ## Dừng và khởi động lại
 
 ```powershell
@@ -144,7 +127,7 @@ Kiểm tra ngày **26/10/2026, Asia/Bangkok (UTC+07:00)**: cả hai service ch�
 | Nginx / ModSecurity / connector | 1.30.6 / 3.0.17 / 1.0.4 |
 | OWASP CRS | 4.30.0; Nginx báo nạp 855 luật |
 
-Digest đầy đủ nằm trong `docker-compose.yml` và [runtime.json](evidence/lab1/runtime.json). [Danh mục bằng chứng và kết quả nghiệm thu](evidence/lab1/README.md) có ảnh hai giao diện, kết quả HTTP/asset, cấu hình và log. TC01–TC04 vẫn **NOT RUN** theo phạm vi Bài 2.
+Digest đầy đủ nằm trong `docker-compose.yml` và [runtime.json](evidence/lab1/runtime.json). [Danh mục bằng chứng và kết quả nghiệm thu](evidence/lab1/README.md) có ảnh hai giao diện, kết quả HTTP/asset, cấu hình và log. TC01–TC04 của Bài 2 đều PASS; xem [báo cáo kiểm thử](docs/lab-report.md).
 
 **Giới hạn đã quan sát:** cấu hình CRS mặc định chặn POST Socket.IO có Content-Type `text/plain` bằng `920420`, sau đó `949110` trả 403. Trang sản phẩm vẫn render; chức năng realtime có thể bị ảnh hưởng. Lab giữ cấu hình nền tảng; chưa tinh chỉnh policy cho Socket.IO. Chi tiết đã loại cookie và session ID nằm trong [browser-observation.json](evidence/lab1/browser-observation.json). Hiện tượng này không phải bằng chứng cho TC02/TC04.
 
