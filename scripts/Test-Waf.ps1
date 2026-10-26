@@ -5,7 +5,7 @@ Run the localhost Juice Shop / CRS lab tests and save sanitized evidence.
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'TC01', 'TC02')]
+    [ValidateSet('All', 'TC01', 'TC02', 'TC03')]
     [string[]]$Test = @('All'),
     [ValidateRange(1, 120)]
     [int]$TimeoutSeconds = 10,
@@ -17,7 +17,8 @@ Add-Type -AssemblyName System.Net.Http
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $runId = 'lab2-' + [guid]::NewGuid().ToString('N')
 $attackJson = [ordered]@{ email = "' OR 1=1--"; password = 'lab-password' } | ConvertTo-Json -Compress
-$selected = if ($Test -contains 'All') { @('TC01', 'TC02') } else { @($Test | Select-Object -Unique) }
+$validJson = [ordered]@{ email = 'admin@juice-sh.op'; password = 'admin123' } | ConvertTo-Json -Compress
+$selected = if ($Test -contains 'All') { @('TC01', 'TC02', 'TC03') } else { @($Test | Select-Object -Unique) }
 $results = New-Object System.Collections.Generic.List[object]
 New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
 
@@ -167,12 +168,14 @@ try {
     foreach ($id in $selected) {
         if ($id -eq 'TC01') { $results.Add((Test-AdminLogin 'TC01' 'http://localhost:3000' $attackJson $runId)) }
         if ($id -eq 'TC02') { $results.Add((Test-BlockedLogin $runId)) }
+        if ($id -eq 'TC03') { $results.Add((Test-AdminLogin 'TC03' 'http://localhost:8080' $validJson ($runId + '-valid'))) }
     }
 } catch {
     $context.preflight = 'FAIL'
     foreach ($id in $selected) {
         $baseUrl = if ($id -eq 'TC01') { 'http://localhost:3000' } else { 'http://localhost:8080' }
-        $record = New-TestRecord $id $baseUrl $attackJson 'Preflight must pass before executing test' $runId
+        $jsonForTest = if ($id -eq 'TC03') { $validJson } else { $attackJson }
+        $record = New-TestRecord $id $baseUrl $jsonForTest 'Preflight must pass before executing test' $runId
         $record.actual = 'NOT RUN: Docker/readiness/configuration preflight failed: ' + $_.Exception.GetBaseException().GetType().Name
         $record.finishedAt = [DateTimeOffset]::Now.ToString('o')
         $results.Add($record)

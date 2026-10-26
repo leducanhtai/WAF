@@ -1,0 +1,30 @@
+﻿{
+    "test":  "TC03",
+    "startedAt":  "2026-10-26T22:20:06.2989031+07:00",
+    "finishedAt":  "2026-10-26T22:20:08.5733702+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "result":  "FAIL",
+    "expected":  "HTTP 200, authenticated admin@juice-sh.op, role admin verified from server",
+    "request":  {
+                    "url":  "http://localhost:8080/rest/user/login",
+                    "method":  "POST",
+                    "path":  "/rest/user/login",
+                    "contentType":  "application/json; charset=utf-8",
+                    "input":  {
+                                  "email":  "admin@juice-sh.op",
+                                  "password":  "admin123"
+                              },
+                    "bodySha256":  "b9d2503993e3807aab3cbb8988bd44e7843d45134551f3ae35d13e32998302e8",
+                    "requestId":  "lab2-7040a013fdb840428e43524903ffecc0-valid"
+                },
+    "response":  {
+                     "statusCode":  200,
+                     "hasAuthenticationToken":  true,
+                     "setCookiePresent":  false
+                 },
+    "identity":  null,
+    "ruleIds":  [
+
+                ],
+    "actual":  "Login did not establish the expected admin identity"
+}
