@@ -1,0 +1,7 @@
+# Local environment and temporary captures
+.env
+.env.*
+!.env.example
+*.tmp
+*.log
+evidence/**/raw/
