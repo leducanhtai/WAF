@@ -1,0 +1,28 @@
+{
+  "method": "Microsoft Edge headless; isolated profile; native CDP Runtime.evaluate and Page.captureScreenshot; no login",
+  "browser": "Edg/156.0.4314.42",
+  "routes": [
+    {
+      "route": "web",
+      "requestedUrl": "http://localhost:3000/",
+      "capturedAt": "2026-10-26T14:52:30.920Z",
+      "result": "PASS",
+      "url": "http://localhost:3000/#/",
+      "title": "OWASP Juice Shop",
+      "appText": "menu\nOWASP Juice Shop\nsearch\nsearch\nclose\naccount_circle\nAccount\nshopping_cart\nYour Basket\n0\nlanguage\nEN\nAll Products\nApple Juice (1000ml)\n1.99¤\nadd_shopping_cart\nAdd to Basket\nApple Pomace\n0.89¤\nadd_shopping_cart\nAdd to Basket\nBanana Juice (1000ml)\n1.99¤\nadd_shopping_cart\nAdd to Basket\nBasil Smoothie\n2.99¤\nadd_shopping_cart\nAdd to Basket\nBerry Juice (1000ml)\n3.49¤\nadd_shopping_cart\nAdd to Basket\nOnly 1 left\nBest Juice Shop Salesman Artwork\n5000¤\nadd_shopping_cart\nAdd to Basket\nBragă (500ml)\n2.49¤\nadd_shopping_cart\nAdd to Basket\nCarrot Juice (1000ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nDragonfruit Juice (500ml)\n3.99¤\nadd_shopping_cart\nAdd to Basket\nEggfruit Juice (500ml)\n8.99¤\nadd_shopping_cart\nAdd to Basket\nElderflower Cordial (500ml)\n3.29¤\nadd_shopping_cart\nAdd to Basket\nFruit Press\n89.99¤\nadd_shopping_cart\nAdd to Basket\nGrape Juice (1000ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nGreen Smoothie\n1.99¤\nadd_shopping_cart\nAdd to Basket\nOnly 1 left\nJuice Shop \"Permafrost\" 2020 Edition\n9999.99¤\nadd_shopping_cart\nAdd to Basket\nLemon Juice (500ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nItems per page:\n16\n1 – 16 of 46",
+      "productImages": 17,
+      "screenshot": "web-browser.png"
+    },
+    {
+      "route": "waf",
+      "requestedUrl": "http://localhost:8080/",
+      "capturedAt": "2026-10-26T14:52:32.871Z",
+      "result": "PASS",
+      "url": "http://localhost:8080/#/",
+      "title": "OWASP Juice Shop",
+      "appText": "menu\nOWASP Juice Shop\nsearch\nsearch\nclose\naccount_circle\nAccount\nshopping_cart\nYour Basket\n0\nlanguage\nEN\nAll Products\nApple Juice (1000ml)\n1.99¤\nadd_shopping_cart\nAdd to Basket\nApple Pomace\n0.89¤\nadd_shopping_cart\nAdd to Basket\nBanana Juice (1000ml)\n1.99¤\nadd_shopping_cart\nAdd to Basket\nBasil Smoothie\n2.99¤\nadd_shopping_cart\nAdd to Basket\nBerry Juice (1000ml)\n3.49¤\nadd_shopping_cart\nAdd to Basket\nOnly 1 left\nBest Juice Shop Salesman Artwork\n5000¤\nadd_shopping_cart\nAdd to Basket\nBragă (500ml)\n2.49¤\nadd_shopping_cart\nAdd to Basket\nCarrot Juice (1000ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nDragonfruit Juice (500ml)\n3.99¤\nadd_shopping_cart\nAdd to Basket\nEggfruit Juice (500ml)\n8.99¤\nadd_shopping_cart\nAdd to Basket\nElderflower Cordial (500ml)\n3.29¤\nadd_shopping_cart\nAdd to Basket\nFruit Press\n89.99¤\nadd_shopping_cart\nAdd to Basket\nGrape Juice (1000ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nGreen Smoothie\n1.99¤\nadd_shopping_cart\nAdd to Basket\nOnly 1 left\nJuice Shop \"Permafrost\" 2020 Edition\n9999.99¤\nadd_shopping_cart\nAdd to Basket\nLemon Juice (500ml)\n2.99¤\nadd_shopping_cart\nAdd to Basket\nItems per page:\n16\n1 – 16 of 46",
+      "productImages": 17,
+      "screenshot": "waf-browser.png"
+    }
+  ]
+}

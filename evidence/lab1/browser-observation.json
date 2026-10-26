@@ -1,0 +1,20 @@
+﻿{
+    "capturedAt":  "2026-10-26T21:53:01.6754285+07:00",
+    "observation":  "Normal browser Socket.IO polling POST rejected by default CRS content type policy; not a lab2 attack test",
+    "source":  "docker compose logs --no-color --no-log-prefix waf (audit JSON; query, headers, body, cookies, session IDs omitted)",
+    "transactionTime":  "Mon Oct 26 14:48:52 2026",
+    "method":  "POST",
+    "path":  "/socket.io/",
+    "statusCode":  403,
+    "rules":  [
+                  {
+                      "id":  "920420",
+                      "message":  "Request content type is not allowed by policy"
+                  },
+                  {
+                      "id":  "949110",
+                      "message":  "Inbound Anomaly Score Exceeded (Total Score: 5)"
+                  }
+              ],
+    "configurationChanged":  false
+}

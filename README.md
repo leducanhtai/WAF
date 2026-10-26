@@ -64,11 +64,15 @@ Mở `http://localhost:3000` để xem Juice Shop. Image backend được khóa 
 ## Chạy WAF
 
 ```powershell
+docker compose pull
 docker compose config --quiet
 docker compose up -d
+powershell.exe -NoProfile -File .\scripts\Wait-LabReady.ps1 -TimeoutSeconds 120
 docker compose ps
 docker compose logs --tail 50 waf
 ```
+
+Nếu chính sách PowerShell trên máy chặn script chưa ký, có thể chạy riêng tiến trình: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Wait-LabReady.ps1 -TimeoutSeconds 120`. Tham số này không sửa execution policy toàn máy.
 
 Mở `http://localhost:8080` để truy cập Juice Shop qua WAF. `depends_on` giúp khởi động backend trước WAF nhưng không bảo đảm backend đã sẵn sàng; cần đợi HTTP thực tế.
 
@@ -80,7 +84,75 @@ Mở `http://localhost:8080` để truy cập Juice Shop qua WAF. `depends_on` g
 
 Image WAF cũng được khóa digest. Lab dùng cấu hình Nginx/ModSecurity/CRS có sẵn trong image, không mount luật tùy chỉnh. Cấu hình được sinh từ biến môi trường khi container khởi động; dùng `docker compose up -d --force-recreate waf` sau khi cần tái tạo cấu hình.
 
-Log được đọc qua `docker compose logs waf`. Vị trí audit log và cấu hình Nginx cần kiểm tra từ chính image đang chạy; bằng chứng cấu hình được lưu trong `evidence/lab1/waf-config.txt`.
+Log được đọc qua `docker compose logs waf`. Với digest đang dùng, access log trỏ tới stdout, error log trỏ tới stderr; audit log là JSON, `RelevantOnly`, `Serial`, đích `/dev/stdout`. Request thành công không khớp luật có thể chỉ có access log. Các thông tin này được kiểm tra trực tiếp trong [bằng chứng cấu hình](evidence/lab1/waf-config.txt).
+
+Script readiness dùng một deadline tổng, mỗi request tối đa 5 giây hoặc thời gian còn lại; mặc định thử lại sau 2 giây. Script bỏ qua proxy của máy, không đi theo redirect và chỉ chấp nhận HTTP 200, Content-Type HTML, tiêu đề Juice Shop và thẻ `app-root` trên cả hai đường truy cập. Exit code `0` là đạt; `1` là chưa sẵn sàng hoặc sai nội dung. Script chỉ đọc HTML; phần render trình duyệt được kiểm tra riêng.
+
+```powershell
+# PowerShell 7 cũng có thể dùng:
+pwsh -NoProfile -File .\scripts\Wait-LabReady.ps1 -TimeoutSeconds 120
+
+# Dùng IPv4 trực tiếp nếu localhost trên máy phân giải IPv6 chậm:
+powershell.exe -NoProfile -File .\scripts\Wait-LabReady.ps1 -WebUrl http://127.0.0.1:3000/ -WafUrl http://127.0.0.1:8080/
+```
+
+## Dừng và khởi động lại
+
+```powershell
+# Dừng container, giữ lại trạng thái hiện tại:
+docker compose stop
+docker compose start
+powershell.exe -NoProfile -File .\scripts\Wait-LabReady.ps1
+
+# Dỡ container và mạng lab:
+docker compose down
+```
+
+Lab không gắn volume dữ liệu Juice Shop; `down` hoặc tái tạo backend làm mất trạng thái thay đổi trong container. Image được giữ lại trên máy. Để đổi phiên bản, thay digest có chủ đích, chạy lại kiểm tra và cập nhật bằng chứng; `pull` với digest hiện tại không tự nâng cấp sang bản mới của tag.
+
+**Xung đột đã xử lý trên máy này:** dịch vụ Apache `PEMHTTPD-x64` của EDB PEM chiếm cổng 8080. Người dùng cho phép và đã dừng dịch vụ bằng PowerShell quản trị; startup type không bị thay đổi. Dịch vụ hiện vẫn dừng để WAF sử dụng cổng 8080. Khi muốn dùng lại Apache: chạy `docker compose down`, sau đó mở PowerShell quản trị và chạy `Start-Service -Name PEMHTTPD-x64`. Trước khi chạy lab lần sau, có thể cần `Stop-Service -Name PEMHTTPD-x64` trong PowerShell quản trị.
+
+## Kiểm tra cấu hình thực tế
+
+```powershell
+docker compose exec -T waf nginx -T
+docker compose exec -T waf cat /etc/modsecurity.d/setup.conf
+docker compose exec -T waf cat /etc/modsecurity.d/modsecurity.conf
+docker compose exec -T waf cat /opt/owasp-crs/crs-setup.conf
+docker compose logs --no-color --tail 100 waf
+```
+
+Trong output cần thấy `load_module ...ngx_http_modsecurity_module.so`, `modsecurity on`, `proxy_pass http://web:3000`, `SecRuleEngine On`, include bộ luật CRS và action `900000` đặt `blocking_paranoia_level=1`. Đây là các đường dẫn đã xác nhận trên image khóa trong Compose.
+
+## Kết quả Bài 1
+
+Kiểm tra ngày **26/10/2026, Asia/Bangkok (UTC+07:00)**: cả hai service chạy; WAF có health `healthy`; cả hai cổng trả HTML Juice Shop và render được trang sản phẩm trong Edge headless. Tám asset JS/CSS được tham chiếu trong HTML tải HTTP 200, có hash giống nhau giữa hai cổng.
+
+| Thành phần | Phiên bản thực tế |
+|---|---|
+| Docker Client / Engine | 28.3.0 / 28.3.0, Linux/amd64 |
+| Docker Compose | v2.38.1-desktop.1 |
+| Windows PowerShell dùng kiểm tra | 5.1.26100.9711 |
+| Juice Shop | 20.3.0 |
+| Nginx / ModSecurity / connector | 1.30.6 / 3.0.17 / 1.0.4 |
+| OWASP CRS | 4.30.0; Nginx báo nạp 855 luật |
+
+Digest đầy đủ nằm trong `docker-compose.yml` và [runtime.json](evidence/lab1/runtime.json). [Danh mục bằng chứng và kết quả nghiệm thu](evidence/lab1/README.md) có ảnh hai giao diện, kết quả HTTP/asset, cấu hình và log. TC01–TC04 vẫn **NOT RUN** theo phạm vi Bài 2.
+
+**Giới hạn đã quan sát:** cấu hình CRS mặc định chặn POST Socket.IO có Content-Type `text/plain` bằng `920420`, sau đó `949110` trả 403. Trang sản phẩm vẫn render; chức năng realtime có thể bị ảnh hưởng. Lab giữ cấu hình nền tảng; chưa tinh chỉnh policy cho Socket.IO. Chi tiết đã loại cookie và session ID nằm trong [browser-observation.json](evidence/lab1/browser-observation.json). Hiện tượng này không phải bằng chứng cho TC02/TC04.
+
+## Xử lý lỗi thường gặp
+
+| Hiện tượng | Kiểm tra / xử lý |
+|---|---|
+| Không kết nối được Docker daemon | Mở Docker Desktop, chọn Linux containers; chạy `docker version` trước |
+| Port unavailable / bind forbidden | Dùng `Get-NetTCPConnection -State Listen -LocalPort 3000,8080`; xác định dịch vụ đang chiếm cổng. Với máy này xem hướng dẫn `PEMHTTPD-x64` ở trên |
+| WAF 502 hoặc readiness timeout | Đọc `docker compose logs --tail 50 web waf`, kiểm tra `BACKEND`, đợi backend khởi động. Chỉ tăng timeout khi backend vẫn đang khởi tạo |
+| HTTP 200 nhưng readiness báo sai trang | Đang gặp trang khác hoặc `/healthz`; kiểm tra nội dung, mapping và process chiếm cổng. `/healthz` chỉ xác nhận Nginx sống |
+| WAF healthy nhưng app không vào được | Chạy readiness cả hai cổng; healthcheck có sẵn của WAF không chứng minh backend phục vụ được |
+| Cảnh báo `ssl_stapling` / issuer certificate | Image tạo sẵn cấu hình HTTPS nội bộ với chứng chỉ tự ký; lab chỉ publish HTTP 8080. Kiểm tra `nginx -T` vẫn exit 0 |
+| Log có `920350` khi dùng `127.0.0.1` | CRS cảnh báo Host dạng IP số; đây chưa phải kết quả kiểm thử SQL Injection. Giao diện lab dùng `localhost` |
+| Socket.IO polling trả 403 | Giới hạn Content-Type mặc định đã nêu trên; đọc rule và giao dịch cụ thể, không tắt toàn bộ WAF |
 
 ## Nguồn đối chiếu
 

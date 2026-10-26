@@ -1,0 +1,55 @@
+﻿{
+    "powerShellVersion":  "5.1.26100.9711",
+    "parser":  "PASS",
+    "tests":  [
+                  {
+                      "name":  "success",
+                      "capturedAt":  "2026-10-26T21:48:26.4427964+07:00",
+                      "command":  "powershell.exe -NoProfile -NonInteractive -File scripts/Wait-LabReady.ps1 -TimeoutSeconds 30",
+                      "expectedExit":  0,
+                      "actualExit":  0,
+                      "elapsedSeconds":  4.86,
+                      "result":  "PASS",
+                      "output":  [
+                                     "Waiting for Juice Shop on both routes (timeout 30s).",
+                                     "[web] http://localhost:3000/ - HTTP 200; Juice Shop title and app-root found",
+                                     "[waf] http://localhost:8080/ - HTTP 200; Juice Shop title and app-root found",
+                                     "READY: both routes passed in 4.25s."
+                                 ]
+                  },
+                  {
+                      "name":  "wrong-page",
+                      "capturedAt":  "2026-10-26T21:48:31.0574048+07:00",
+                      "command":  "powershell.exe -NoProfile -NonInteractive -File scripts/Wait-LabReady.ps1 -TimeoutSeconds 4 -WebUrl http://127.0.0.1:3000/ -WafUrl http://127.0.0.1:8080/healthz",
+                      "expectedExit":  1,
+                      "actualExit":  1,
+                      "elapsedSeconds":  4.6,
+                      "result":  "PASS",
+                      "output":  [
+                                     "Waiting for Juice Shop on both routes (timeout 4s).",
+                                     "[web] http://127.0.0.1:3000/ - HTTP 200; Juice Shop title and app-root found",
+                                     "[waf] http://127.0.0.1:8080/healthz - HTTP 200; expected Juice Shop HTML (html=False, app=False)",
+                                     "NOT READY after 4s. Check \u0027docker compose ps\u0027 and \u0027docker compose logs --tail 50 web waf\u0027.",
+                                     "[web] http://127.0.0.1:3000/ - HTTP 200; Juice Shop title and app-root found",
+                                     "[waf] http://127.0.0.1:8080/healthz - HTTP 200; expected Juice Shop HTML (html=False, app=False)"
+                                 ]
+                  },
+                  {
+                      "name":  "connection-failure",
+                      "capturedAt":  "2026-10-26T21:48:35.7673393+07:00",
+                      "command":  "powershell.exe -NoProfile -NonInteractive -File scripts/Wait-LabReady.ps1 -TimeoutSeconds 4 -WebUrl http://127.0.0.1:3000/ -WafUrl http://127.0.0.1:49123/",
+                      "expectedExit":  1,
+                      "actualExit":  1,
+                      "elapsedSeconds":  4.71,
+                      "result":  "PASS",
+                      "output":  [
+                                     "Waiting for Juice Shop on both routes (timeout 4s).",
+                                     "[web] http://127.0.0.1:3000/ - HTTP 200; Juice Shop title and app-root found",
+                                     "[waf] http://127.0.0.1:49123/ - No connection could be made because the target machine actively refused it 127.0.0.1:49123",
+                                     "NOT READY after 4s. Check \u0027docker compose ps\u0027 and \u0027docker compose logs --tail 50 web waf\u0027.",
+                                     "[web] http://127.0.0.1:3000/ - HTTP 200; Juice Shop title and app-root found",
+                                     "[waf] http://127.0.0.1:49123/ - No connection could be made because the target machine actively refused it 127.0.0.1:49123"
+                                 ]
+                  }
+              ]
+}

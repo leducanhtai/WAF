@@ -1,0 +1,17 @@
+﻿Captured: 2026-10-26T21:53:01.3481308+07:00
+Command: docker compose logs --no-color --no-log-prefix waf
+Selection: startup/configuration lines and successful GET / access lines only; session/cookie lines omitted
+Detected CRS config file version: v4
+Configuring 900000 for BLOCKING_PARANOIA with blocking_paranoia_level=1
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2026/10/26 14:46:10 [warn] 1#1: "ssl_stapling" ignored, issuer certificate not found for certificate "/etc/nginx/conf/server.crt"
+nginx: [warn] "ssl_stapling" ignored, issuer certificate not found for certificate "/etc/nginx/conf/server.crt"
+2026/10/26 14:46:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/855/0)
+2026/10/26 14:46:10 [notice] 1#1: libmodsecurity3 version 3.0.17
+172.22.0.1 - - [26/Oct/2026:14:46:14 +0000] "GET / HTTP/1.1" 200 9984 "-" "-" "-"
+172.22.0.1 - - [26/Oct/2026:14:47:37 +0000] "GET / HTTP/1.1" 200 9984 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.9711" "-"
+172.22.0.1 - - [26/Oct/2026:14:48:26 +0000] "GET / HTTP/1.1" 200 9984 "-" "-" "-"
+172.22.0.1 - - [26/Oct/2026:14:48:51 +0000] "GET / HTTP/1.1" 200 3163 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0" "-"
+172.22.0.1 - - [26/Oct/2026:14:49:06 +0000] "GET / HTTP/1.1" 200 9984 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.9711" "-"
+172.22.0.1 - - [26/Oct/2026:14:49:46 +0000] "GET / HTTP/1.1" 200 9984 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.9711" "-"
+172.22.0.1 - - [26/Oct/2026:14:51:40 +0000] "GET / HTTP/1.1" 200 3163 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0" "-"

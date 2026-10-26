@@ -1,0 +1,167 @@
+﻿{
+    "capturedAt":  "2026-10-26T21:49:51.6294987+07:00",
+    "method":  "GET each unique JS/CSS reference in WAF HTML using Invoke-WebRequest; compare SHA256 across both routes",
+    "result":  "PASS",
+    "assets":  [
+                   {
+                       "asset":  "chunk-1qQQGal7.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/chunk-1qQQGal7.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  148929,
+                                             "sha256":  "acd90ffd4f65f52439a968a11ba2dcd312b0b46c26f7c2d9846e1d885262c0c3"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/chunk-1qQQGal7.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  148929,
+                                             "sha256":  "acd90ffd4f65f52439a968a11ba2dcd312b0b46c26f7c2d9846e1d885262c0c3"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "chunk-Cv2YgWUq.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/chunk-Cv2YgWUq.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  367621,
+                                             "sha256":  "fbc703799bc777df67e696f42cd8889e0fdf977d0bdc19071c931f7d1501cdd1"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/chunk-Cv2YgWUq.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  367621,
+                                             "sha256":  "fbc703799bc777df67e696f42cd8889e0fdf977d0bdc19071c931f7d1501cdd1"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "chunk-DBPdFzgj.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/chunk-DBPdFzgj.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  2458,
+                                             "sha256":  "97f1c69840855dfd1497f72d325d97f1c93caf45ed10ee0599c2967757a8b8aa"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/chunk-DBPdFzgj.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  2458,
+                                             "sha256":  "97f1c69840855dfd1497f72d325d97f1c93caf45ed10ee0599c2967757a8b8aa"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "main.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/main.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  1242633,
+                                             "sha256":  "a029a0ee1822c924fe7eef8aa9316e4c196ff54f3279c0286abb472971b375a4"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/main.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  1242633,
+                                             "sha256":  "a029a0ee1822c924fe7eef8aa9316e4c196ff54f3279c0286abb472971b375a4"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "polyfills.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/polyfills.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  34585,
+                                             "sha256":  "15c6f58707b9b19116fde3a3f6a0ce9cf83427d64a91e95cb91fe1056c3da616"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/polyfills.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  34585,
+                                             "sha256":  "15c6f58707b9b19116fde3a3f6a0ce9cf83427d64a91e95cb91fe1056c3da616"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "rolldown-runtime-BoHGiXSq.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/rolldown-runtime-BoHGiXSq.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  250,
+                                             "sha256":  "68e9792c539bcfd8cb3a9516d0b216cfa70fcbd0fc02738f58ee7196f91e29fb"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/rolldown-runtime-BoHGiXSq.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  250,
+                                             "sha256":  "68e9792c539bcfd8cb3a9516d0b216cfa70fcbd0fc02738f58ee7196f91e29fb"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "scripts.js",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/scripts.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  20700,
+                                             "sha256":  "f9a518486ced55510682d2a2b5896b6a1d2cb9566c46291994180863810d894b"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/scripts.js",
+                                             "statusCode":  200,
+                                             "contentType":  "application/javascript; charset=UTF-8",
+                                             "bytes":  20700,
+                                             "sha256":  "f9a518486ced55510682d2a2b5896b6a1d2cb9566c46291994180863810d894b"
+                                         }
+                                     ]
+                   },
+                   {
+                       "asset":  "styles.css",
+                       "identicalAcrossRoutes":  true,
+                       "responses":  [
+                                         {
+                                             "url":  "http://127.0.0.1:3000/styles.css",
+                                             "statusCode":  200,
+                                             "contentType":  "text/css; charset=UTF-8",
+                                             "bytes":  157528,
+                                             "sha256":  "5f276ee5a575d172cfea74252632dd78dca641a958382dab85c2cc1ea90801bd"
+                                         },
+                                         {
+                                             "url":  "http://127.0.0.1:8080/styles.css",
+                                             "statusCode":  200,
+                                             "contentType":  "text/css; charset=UTF-8",
+                                             "bytes":  157528,
+                                             "sha256":  "5f276ee5a575d172cfea74252632dd78dca641a958382dab85c2cc1ea90801bd"
+                                         }
+                                     ]
+                   }
+               ]
+}

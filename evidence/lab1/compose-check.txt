@@ -1,0 +1,11 @@
+﻿Captured: 2026-10-26T21:53:02.0184008+07:00
+Command: docker compose config --quiet
+Exit code: 0
+Command: docker compose ps
+NAME        IMAGE                                                                                                  COMMAND                  SERVICE   CREATED          STATUS                   PORTS
+waf-waf-1   owasp/modsecurity-crs:nginx@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d    "/docker-entrypoint.…"   waf       10 minutes ago   Up 6 minutes (healthy)   127.0.0.1:8080->8080/tcp
+waf-web-1   bkimminich/juice-shop:latest@sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4   "/nodejs/bin/node /j…"   web       11 minutes ago   Up 11 minutes            127.0.0.1:3000->3000/tcp
+Command: Get-Service PEMHTTPD-x64
+Name          Status
+----          ------
+PEMHTTPD-x64 Stopped

@@ -1,0 +1,74 @@
+﻿{
+    "capturedAt":  "2026-10-26T21:50:09.5053849+07:00",
+    "timezone":  "Asia/Bangkok (UTC+07:00)",
+    "dockerClient":  "28.3.0",
+    "dockerServer":  "28.3.0",
+    "serverPlatform":  "linux/amd64",
+    "compose":  "Docker Compose version v2.38.1-desktop.1",
+    "powerShell":  "5.1.26100.9711",
+    "nginx":  [
+                  "nginx version: nginx/1.30.6"
+              ],
+    "modSecurity":  "3.0.17 (nginx -T; see waf-config.txt)",
+    "nginxConnector":  "1.0.4 (nginx -T; see waf-config.txt)",
+    "crs":  "4.30.0 (crs-setup.conf; see waf-config.txt)",
+    "loadedRules":  855,
+    "services":  [
+                     {
+                         "service":  "web",
+                         "name":  "/waf-web-1",
+                         "state":  "running",
+                         "health":  null,
+                         "startedAt":  "2026-10-26T14:41:19.878366496Z",
+                         "ports":  {
+                                       "3000/tcp":  [
+                                                        {
+                                                            "HostIp":  "127.0.0.1",
+                                                            "HostPort":  "3000"
+                                                        }
+                                                    ]
+                                   },
+                         "imageReference":  "bkimminich/juice-shop:latest@sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4",
+                         "imageId":  "sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4",
+                         "repoDigests":  [
+                                             "bkimminich/juice-shop@sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4"
+                                         ],
+                         "platform":  "linux/amd64",
+                         "imageCreated":  "2026-10-12T14:53:52.591317154Z",
+                         "imageVersionLabel":  "20.3.0",
+                         "sourceRevision":  "e39a3bd"
+                     },
+                     {
+                         "service":  "waf",
+                         "name":  "/waf-waf-1",
+                         "state":  "running",
+                         "health":  "healthy",
+                         "startedAt":  "2026-10-26T14:46:09.218941141Z",
+                         "ports":  {
+                                       "8080/tcp":  [
+                                                        {
+                                                            "HostIp":  "127.0.0.1",
+                                                            "HostPort":  "8080"
+                                                        }
+                                                    ]
+                                   },
+                         "imageReference":  "owasp/modsecurity-crs:nginx@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d",
+                         "imageId":  "sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d",
+                         "repoDigests":  [
+                                             "owasp/modsecurity-crs@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d"
+                                         ],
+                         "platform":  "linux/amd64",
+                         "imageCreated":  "2026-10-18T02:10:05.173076056Z",
+                         "imageVersionLabel":  "1.30.6",
+                         "sourceRevision":  "bb7393196554e11f7ba95452856d8b5faff217bf"
+                     }
+                 ],
+    "portConflict":  {
+                         "service":  "PEMHTTPD-x64",
+                         "originalPid":  5532,
+                         "resolution":  "User authorized service stop, then confirmed manual administrator stop",
+                         "currentServiceStatus":  "Stopped",
+                         "startupTypeChanged":  false,
+                         "process":  "httpd.exe"
+                     }
+}
