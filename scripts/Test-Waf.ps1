@@ -5,7 +5,7 @@ Run the localhost Juice Shop / CRS lab tests and save sanitized evidence.
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'TC01', 'TC02', 'TC03')]
+    [ValidateSet('All', 'TC01', 'TC02', 'TC03', 'TC04')]
     [string[]]$Test = @('All'),
     [ValidateRange(1, 120)]
     [int]$TimeoutSeconds = 10,
@@ -18,7 +18,7 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $runId = 'lab2-' + [guid]::NewGuid().ToString('N')
 $attackJson = [ordered]@{ email = "' OR 1=1--"; password = 'lab-password' } | ConvertTo-Json -Compress
 $validJson = [ordered]@{ email = 'admin@juice-sh.op'; password = 'admin123' } | ConvertTo-Json -Compress
-$selected = if ($Test -contains 'All') { @('TC01', 'TC02', 'TC03') } else { @($Test | Select-Object -Unique) }
+$selected = if ($Test -contains 'All') { @('TC01', 'TC02', 'TC03', 'TC04') } else { @($Test | Select-Object -Unique | Sort-Object) }
 $results = New-Object System.Collections.Generic.List[object]
 New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
 
@@ -157,6 +157,46 @@ function Test-BlockedLogin {
     return $record
 }
 
+function Test-RuleCorrelation {
+    param($Blocked)
+    $record = New-TestRecord 'TC04' 'http://localhost:8080' $attackJson 'Rule 942100 in fresh TC02 transaction with HTTP 403' $Blocked.request.requestId
+    $record.sourceTest = $Blocked
+    $record.response = $Blocked.response
+    $record.logSinceUtc = $Blocked.logSinceUtc
+    $record.transactions = @()
+    $record.result = 'FAIL'
+    $record.actual = 'No matching fresh audit transaction with rule 942100'
+    try {
+        for ($attempt = 0; $attempt -lt 5; $attempt++) {
+            $raw = Invoke-Compose @('logs', '--no-color', '--no-log-prefix', '--since', $Blocked.logSinceUtc, 'waf')
+            foreach ($line in ($raw -split '\r?\n')) {
+                try { $audit = $line | ConvertFrom-Json -ErrorAction Stop } catch { continue }
+                $tx = $audit.transaction
+                if (-not $tx) { continue }
+                $header = $tx.request.headers.PSObject.Properties | Where-Object { $_.Name -ieq 'X-Lab-Request-Id' }
+                if ($header.Value -ne $Blocked.request.requestId -or $tx.request.uri -ne '/rest/user/login' -or $tx.request.method -ne 'POST') { continue }
+                # Allowlist fields only: never persist audit headers, body, cookie or token.
+                $rules = @($tx.messages | ForEach-Object { [string]$_.details.ruleId } | Select-Object -Unique)
+                $record.transactions = @([ordered]@{
+                    timestampUtc = $tx.time_stamp; transactionId = $tx.unique_id
+                    requestId = $header.Value; method = $tx.request.method; uri = $tx.request.uri
+                    statusCode = $tx.response.http_code; ruleIds = $rules
+                })
+                $record.ruleIds = $rules
+                if ($Blocked.result -eq 'PASS' -and $tx.response.http_code -eq 403 -and $rules -contains '942100') {
+                    $record.result = 'PASS'
+                    $record.actual = 'Fresh TC02 request ID matched JSON audit transaction; 942100 detected SQLi and 949110 enforced anomaly blocking'
+                }
+            }
+            $raw = $null
+            if ($record.transactions.Count -gt 0) { break }
+            Start-Sleep -Milliseconds 500
+        }
+    } catch { $record.actual = 'Audit correlation failed: ' + $_.Exception.GetBaseException().GetType().Name }
+    $record.finishedAt = [DateTimeOffset]::Now.ToString('o')
+    return $record
+}
+
 $context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::Now.ToString('o'); endpointSource = 'build/server.js and build/routes/currentUser.js inspected; POST /rest/user/login; authenticated GET /api/Users/:id; whoami blocked by CRS 932260'; preflight = 'NOT RUN' }
 try {
     $configuration = Invoke-Compose @('config', '--format', 'json') | ConvertFrom-Json
@@ -171,8 +211,12 @@ try {
     $context.images = [ordered]@{ web = $configuration.services.web.image; waf = $configuration.services.waf.image }
     foreach ($id in $selected) {
         if ($id -eq 'TC01') { $results.Add((Test-AdminLogin 'TC01' 'http://localhost:3000' $attackJson $runId)) }
-        if ($id -eq 'TC02') { $results.Add((Test-BlockedLogin $runId)) }
+        if ($id -eq 'TC02') { $blocked = Test-BlockedLogin $runId; $results.Add($blocked) }
         if ($id -eq 'TC03') { $results.Add((Test-AdminLogin 'TC03' 'http://localhost:8080' $validJson ($runId + '-valid'))) }
+        if ($id -eq 'TC04') {
+            if (-not $blocked) { $blocked = Test-BlockedLogin $runId }
+            $results.Add((Test-RuleCorrelation $blocked))
+        }
     }
 } catch {
     $context.preflight = 'FAIL'
