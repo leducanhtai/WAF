@@ -5,7 +5,7 @@ Run the localhost Juice Shop / CRS lab tests and save sanitized evidence.
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'TC01')]
+    [ValidateSet('All', 'TC01', 'TC02')]
     [string[]]$Test = @('All'),
     [ValidateRange(1, 120)]
     [int]$TimeoutSeconds = 10,
@@ -17,7 +17,7 @@ Add-Type -AssemblyName System.Net.Http
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $runId = 'lab2-' + [guid]::NewGuid().ToString('N')
 $attackJson = [ordered]@{ email = "' OR 1=1--"; password = 'lab-password' } | ConvertTo-Json -Compress
-$selected = if ($Test -contains 'All') { @('TC01') } else { @($Test | Select-Object -Unique) }
+$selected = if ($Test -contains 'All') { @('TC01', 'TC02') } else { @($Test | Select-Object -Unique) }
 $results = New-Object System.Collections.Generic.List[object]
 New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
 
@@ -125,6 +125,30 @@ function Test-AdminLogin {
     return $record
 }
 
+function Test-BlockedLogin {
+    param([string]$RequestId)
+    $record = New-TestRecord 'TC02' 'http://localhost:8080' $attackJson 'HTTP 403; no authentication token or session cookie' $RequestId
+    $record.logSinceUtc = [DateTimeOffset]::UtcNow.AddSeconds(-2).ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+    $client = New-LabClient
+    try {
+        $login = Invoke-LabHttp -Client $client -Url $record.request.url -Method POST -Json $attackJson -RequestId $RequestId
+        $hasToken = -not [string]::IsNullOrWhiteSpace([string]$login.Json.authentication.token) -or
+            -not [string]::IsNullOrWhiteSpace([string]$login.Json.token) -or
+            -not [string]::IsNullOrWhiteSpace([string]$login.Json.data.tmpToken)
+        $record.response = [ordered]@{ statusCode = $login.Status; hasAuthenticationToken = $hasToken; setCookiePresent = $login.HasSetCookie }
+        $record.result = 'FAIL'
+        $record.actual = 'Blocked-login response did not meet HTTP 403 / no-token criteria'
+        if ($login.Status -eq 403 -and -not $hasToken -and -not $login.HasSetCookie) {
+            $record.result = 'PASS'
+            $record.actual = 'HTTP 403; no authentication token or Set-Cookie returned'
+        }
+    } catch {
+        $record.result = 'FAIL'
+        $record.actual = 'HTTP request failed: ' + $_.Exception.GetBaseException().GetType().Name
+    } finally { $client.Dispose(); $record.finishedAt = [DateTimeOffset]::Now.ToString('o') }
+    return $record
+}
+
 $context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::Now.ToString('o'); endpointSource = 'main.js, build/server.js, build/routes/login.js and build/routes/currentUser.js inspected; whoami requires a token cookie'; preflight = 'NOT RUN' }
 try {
     $configuration = Invoke-Compose @('config', '--format', 'json') | ConvertFrom-Json
@@ -139,11 +163,13 @@ try {
     $context.images = [ordered]@{ web = $configuration.services.web.image; waf = $configuration.services.waf.image }
     foreach ($id in $selected) {
         if ($id -eq 'TC01') { $results.Add((Test-AdminLogin 'TC01' 'http://localhost:3000' $attackJson $runId)) }
+        if ($id -eq 'TC02') { $results.Add((Test-BlockedLogin $runId)) }
     }
 } catch {
     $context.preflight = 'FAIL'
     foreach ($id in $selected) {
-        $record = New-TestRecord $id 'http://localhost:3000' $attackJson 'Preflight must pass before executing test' $runId
+        $baseUrl = if ($id -eq 'TC01') { 'http://localhost:3000' } else { 'http://localhost:8080' }
+        $record = New-TestRecord $id $baseUrl $attackJson 'Preflight must pass before executing test' $runId
         $record.actual = 'NOT RUN: Docker/readiness/configuration preflight failed: ' + $_.Exception.GetBaseException().GetType().Name
         $record.finishedAt = [DateTimeOffset]::Now.ToString('o')
         $results.Add($record)
