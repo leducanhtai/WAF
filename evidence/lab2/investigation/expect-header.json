@@ -1,0 +1,20 @@
+﻿{
+    "capturedAt":  "2026-10-26T22:13:00.5918980+07:00",
+    "requestId":  "lab2-934426c113c04412b01e0c5d15828d36-valid",
+    "transactionId":  "17930275307.354240",
+    "time":  "Mon Oct 26 15:12:10 2026",
+    "path":  "/rest/user/login",
+    "status":  403,
+    "expectHeader":  "100-continue",
+    "rules":  [
+                  {
+                      "id":  "920450",
+                      "message":  "HTTP header is restricted by policy (/expect/)"
+                  },
+                  {
+                      "id":  "949110",
+                      "message":  "Inbound Anomaly Score Exceeded (Total Score: 5)"
+                  }
+              ],
+    "resolution":  "Disable automatic ExpectContinue in HttpClient; WAF policy unchanged. Re-run SQLi comparison before implementing TC03."
+}

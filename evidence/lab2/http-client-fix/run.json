@@ -1,0 +1,81 @@
+﻿{
+    "runId":  "lab2-6bb67001083642c688268ccdc00812ac",
+    "startedAt":  "2026-10-26T22:13:01.2335639+07:00",
+    "endpointSource":  "main.js, build/server.js, build/routes/login.js and build/routes/currentUser.js inspected; whoami requires a token cookie",
+    "preflight":  "PASS",
+    "engine":  "On",
+    "blockingParanoia":  "1",
+    "images":  {
+                   "web":  "bkimminich/juice-shop:latest@sha256:42843723a7bf4246aa5d63c324978b17ef296ac78434aeddd34c427bfb5853f4",
+                   "waf":  "owasp/modsecurity-crs:nginx@sha256:7698c48a41a43138ae317feeec964d1515b861cc1d9e50617bc1cdfe9f314e1d"
+               },
+    "finishedAt":  "2026-10-26T22:13:12.5027574+07:00",
+    "results":  [
+                    {
+                        "test":  "TC01",
+                        "startedAt":  "2026-10-26T22:13:07.9428692+07:00",
+                        "finishedAt":  "2026-10-26T22:13:10.3238338+07:00",
+                        "timezone":  "Asia/Bangkok (UTC+07:00)",
+                        "result":  "PASS",
+                        "expected":  "HTTP 200, authenticated admin@juice-sh.op, role admin verified from server",
+                        "request":  {
+                                        "url":  "http://localhost:3000/rest/user/login",
+                                        "method":  "POST",
+                                        "path":  "/rest/user/login",
+                                        "contentType":  "application/json; charset=utf-8",
+                                        "input":  {
+                                                      "email":  "\u0027 OR 1=1--",
+                                                      "password":  "lab-password"
+                                                  },
+                                        "bodySha256":  "ecf2d37cbfb9e3a71561cb3274f65d64bb483a60492234c39f6526b059a3bacc",
+                                        "requestId":  "lab2-6bb67001083642c688268ccdc00812ac"
+                                    },
+                        "response":  {
+                                         "statusCode":  200,
+                                         "hasAuthenticationToken":  true,
+                                         "setCookiePresent":  false
+                                     },
+                        "identity":  {
+                                         "whoamiStatus":  200,
+                                         "id":  1,
+                                         "email":  "admin@juice-sh.op",
+                                         "role":  "admin"
+                                     },
+                        "ruleIds":  [
+
+                                    ],
+                        "actual":  "Login 200; fresh token cookie verified by server whoami: admin@juice-sh.op / admin"
+                    },
+                    {
+                        "test":  "TC02",
+                        "startedAt":  "2026-10-26T22:13:10.3405673+07:00",
+                        "finishedAt":  "2026-10-26T22:13:12.4476788+07:00",
+                        "timezone":  "Asia/Bangkok (UTC+07:00)",
+                        "result":  "PASS",
+                        "expected":  "HTTP 403; no authentication token or session cookie",
+                        "request":  {
+                                        "url":  "http://localhost:8080/rest/user/login",
+                                        "method":  "POST",
+                                        "path":  "/rest/user/login",
+                                        "contentType":  "application/json; charset=utf-8",
+                                        "input":  {
+                                                      "email":  "\u0027 OR 1=1--",
+                                                      "password":  "lab-password"
+                                                  },
+                                        "bodySha256":  "ecf2d37cbfb9e3a71561cb3274f65d64bb483a60492234c39f6526b059a3bacc",
+                                        "requestId":  "lab2-6bb67001083642c688268ccdc00812ac"
+                                    },
+                        "response":  {
+                                         "statusCode":  403,
+                                         "hasAuthenticationToken":  false,
+                                         "setCookiePresent":  false
+                                     },
+                        "identity":  null,
+                        "ruleIds":  [
+
+                                    ],
+                        "actual":  "HTTP 403; no authentication token or Set-Cookie returned",
+                        "logSinceUtc":  "2026-10-26T15:13:08.340Z"
+                    }
+                ]
+}

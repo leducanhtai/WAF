@@ -1,0 +1,19 @@
+﻿{
+    "capturedAt":  "2026-10-26T22:13:25.3478165+07:00",
+    "requestId":  "lab2-6bb67001083642c688268ccdc00812ac",
+    "transactionId":  "179302759246.874593",
+    "time":  "Mon Oct 26 15:13:12 2026",
+    "path":  "/rest/user/login",
+    "status":  403,
+    "expectHeaderPresent":  false,
+    "rules":  [
+                  {
+                      "id":  "942100",
+                      "message":  "SQL Injection Attack Detected via libinjection"
+                  },
+                  {
+                      "id":  "949110",
+                      "message":  "Inbound Anomaly Score Exceeded (Total Score: 5)"
+                  }
+              ]
+}

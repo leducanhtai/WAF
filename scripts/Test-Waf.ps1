@@ -51,6 +51,9 @@ function New-LabClient {
     $handler.AllowAutoRedirect = $false
     $client = New-Object System.Net.Http.HttpClient($handler)
     $client.Timeout = [TimeSpan]::FromSeconds($TimeoutSeconds)
+    # .NET Framework otherwise adds Expect: 100-continue to POST requests.
+    # CRS 920450 rejects that header before SQLi/valid-login can be assessed.
+    $client.DefaultRequestHeaders.ExpectContinue = $false
     return $client
 }
 
