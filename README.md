@@ -50,7 +50,18 @@ Các tiêu chí trên không chứng minh khả năng chặn SQL Injection. TC01
 3. `feat(lab1): add Nginx ModSecurity CRS gateway`
 4. `chore(lab1): add readiness checks and runtime evidence`
 
-Hướng dẫn vận hành và kết quả thực tế được bổ sung theo tiến độ triển khai.
+## Chạy riêng backend
+
+```powershell
+docker compose config --quiet
+docker compose up -d web
+Invoke-WebRequest -UseBasicParsing http://localhost:3000
+docker compose logs --tail 30 web
+```
+
+Mở `http://localhost:3000` để xem Juice Shop. Image backend được khóa bằng digest trong Compose; nhãn `latest` chỉ thể hiện tag nguồn đã tải. Phiên bản thực tế và kết quả HTTP được ghi trong `evidence/lab1/backend-check.json`.
+
+Hướng dẫn vận hành toàn bộ WAF được bổ sung ở bước tiếp theo.
 
 ## Nguồn đối chiếu
 
