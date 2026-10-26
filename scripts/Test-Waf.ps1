@@ -92,7 +92,7 @@ function Get-BodyHash {
 function New-TestRecord {
     param([string]$Id, [string]$BaseUrl, [string]$Json, [string]$Expected, [string]$RequestId)
     return [ordered]@{
-        test = $Id; startedAt = [DateTimeOffset]::Now.ToString('o'); finishedAt = $null
+        test = $Id; startedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o'); finishedAt = $null
         timezone = 'Asia/Bangkok (UTC+07:00)'; result = 'NOT RUN'; expected = $Expected
         request = [ordered]@{ url = "$BaseUrl/rest/user/login"; method = 'POST'; path = '/rest/user/login'; contentType = 'application/json; charset=utf-8'; input = ($Json | ConvertFrom-Json); bodySha256 = (Get-BodyHash $Json); requestId = $RequestId }
         response = $null; identity = $null; ruleIds = @(); actual = 'Not executed'
@@ -129,7 +129,7 @@ function Test-AdminLogin {
     } catch {
         $record.result = 'FAIL'
         $record.actual = 'HTTP/identity verification failed: ' + $_.Exception.GetBaseException().GetType().Name
-    } finally { $token = $null; $client.Dispose(); $record.finishedAt = [DateTimeOffset]::Now.ToString('o') }
+    } finally { $token = $null; $client.Dispose(); $record.finishedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o') }
     return $record
 }
 
@@ -153,7 +153,7 @@ function Test-BlockedLogin {
     } catch {
         $record.result = 'FAIL'
         $record.actual = 'HTTP request failed: ' + $_.Exception.GetBaseException().GetType().Name
-    } finally { $client.Dispose(); $record.finishedAt = [DateTimeOffset]::Now.ToString('o') }
+    } finally { $client.Dispose(); $record.finishedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o') }
     return $record
 }
 
@@ -193,17 +193,20 @@ function Test-RuleCorrelation {
             Start-Sleep -Milliseconds 500
         }
     } catch { $record.actual = 'Audit correlation failed: ' + $_.Exception.GetBaseException().GetType().Name }
-    $record.finishedAt = [DateTimeOffset]::Now.ToString('o')
+    $record.finishedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o')
     return $record
 }
 
-$context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::Now.ToString('o'); endpointSource = 'build/server.js and build/routes/currentUser.js inspected; POST /rest/user/login; authenticated GET /api/Users/:id; whoami blocked by CRS 932260'; preflight = 'NOT RUN' }
+$context = [ordered]@{ runId = $runId; startedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o'); endpointSource = 'build/server.js and build/routes/currentUser.js inspected; POST /rest/user/login; authenticated GET /api/Users/:id; whoami blocked by CRS 932260'; preflight = 'NOT RUN' }
 try {
+    $preflightStage = 'docker compose config'
     $configuration = Invoke-Compose @('config', '--format', 'json') | ConvertFrom-Json
+    $preflightStage = 'runtime WAF engine/paranoia configuration'
     $environmentValues = (Invoke-Compose @('exec', '-T', 'waf', 'printenv', 'MODSEC_RULE_ENGINE', 'BLOCKING_PARANOIA')).Trim() -split '\r?\n'
     $activeModsec = Invoke-Compose @('exec', '-T', 'waf', 'cat', '/etc/modsecurity.d/modsecurity.conf')
     $activeCrs = Invoke-Compose @('exec', '-T', 'waf', 'cat', '/opt/owasp-crs/crs-setup.conf')
     if ($environmentValues[0] -ne 'On' -or $environmentValues[1] -ne '1' -or $activeModsec -notmatch '(?m)^SecRuleEngine On\s*$' -or $activeCrs -notmatch 'setvar:tx.blocking_paranoia_level=1"') { throw 'WAF must be On at paranoia 1.' }
+    $preflightStage = 'HTTP readiness on localhost:3000 and localhost:8080'
     & powershell.exe -NoProfile -NonInteractive -File (Join-Path $PSScriptRoot 'Wait-LabReady.ps1') -TimeoutSeconds 30
     if ($LASTEXITCODE -ne 0) { throw 'Lab readiness failed.' }
     $context.preflight = 'PASS'
@@ -224,8 +227,8 @@ try {
         $baseUrl = if ($id -eq 'TC01') { 'http://localhost:3000' } else { 'http://localhost:8080' }
         $jsonForTest = if ($id -eq 'TC03') { $validJson } else { $attackJson }
         $record = New-TestRecord $id $baseUrl $jsonForTest 'Preflight must pass before executing test' $runId
-        $record.actual = 'NOT RUN: Docker/readiness/configuration preflight failed: ' + $_.Exception.GetBaseException().GetType().Name
-        $record.finishedAt = [DateTimeOffset]::Now.ToString('o')
+        $record.actual = ('NOT RUN: failed at ' + $preflightStage + ': ') + $_.Exception.GetBaseException().GetType().Name
+        $record.finishedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o')
         $results.Add($record)
     }
 }
@@ -234,7 +237,7 @@ foreach ($record in $results) {
     $record | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $OutputDirectory ($record.test + '.json')) -Encoding UTF8
     Write-Host ("{0}: {1} - {2}" -f $record.test, $record.result, $record.actual)
 }
-$context.finishedAt = [DateTimeOffset]::Now.ToString('o')
+$context.finishedAt = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(7)).ToString('o')
 $context.results = @($results.ToArray())
 $context | ConvertTo-Json -Depth 14 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'run.json') -Encoding UTF8
 if ($results.Count -ne $selected.Count -or @($results | Where-Object { $_.result -ne 'PASS' }).Count -gt 0) { exit 1 }
